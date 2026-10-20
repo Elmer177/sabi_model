@@ -29,7 +29,7 @@ def download_youtube_as_wav(url, output_directory):
     print("完了しました！")
 
 # 使い方
-youtube_url = "https://youtu.be/QcpjV43ALCA?si=s0YnZs6q5GNOkH4K"
+youtube_url = "https://youtu.be/JhoK7chbpZ0?si=vo-xHMHphH0RAtKL"
 output_dir = "./my_wav_files"
 
 download_youtube_as_wav(youtube_url, output_dir)
