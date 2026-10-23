@@ -1,6 +1,7 @@
 # sabi_model
 wavファイルから曲のサビ区間を推定する学習モデル
 
+```
 sabi_model/
 ├── data/music_dataset/   音源とサビのラベル（変更なし）
 ├── my_wav_files/         YouTube から取ってきた音源（変更なし）
@@ -14,3 +15,4 @@ sabi_model/
 ├── models/               学習済みモデルと特徴量の設定（.pkl, .json）
 ├── cache/                作り直せる中間ファイル（X.npy, y.npy, features_*.npz/.pkl）
 └── results/              評価結果の CSV と図（results/figures/）
+```
