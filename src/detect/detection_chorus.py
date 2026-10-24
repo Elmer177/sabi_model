@@ -1,17 +1,20 @@
 import librosa
 import numpy as np
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # src/ を import パスに追加
+from paths import AUDIO_DIR, MODELS_DIR
 import joblib # モデルの読み込みに必要
 import json   # 設定の読み込みに必要
 import matplotlib.pyplot as plt
 import librosa.display
 
 #設定ファイルとモデルファイルのパス
-MODEL_PATH = 'trained_random_forest_chorus_detector.pkl'
-CONFIG_PATH = 'feature_extraction_config.json'
+MODEL_PATH = os.path.join(MODELS_DIR, 'trained_random_forest_chorus_detector.pkl')
+CONFIG_PATH = os.path.join(MODELS_DIR, 'feature_extraction_config.json')
 
 #サビ検出したい曲のパス
-NEW_SONG_PATH = 'music_dataset/audio/new_song_example.wav' 
+NEW_SONG_PATH = os.path.join(AUDIO_DIR, 'new_song_example.wav')
 
 #学習済みモデルと設定の読み込み
 try:

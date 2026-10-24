@@ -5,19 +5,20 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # src/ を import パスに追加
+from paths import AUDIO_DIR, ANNOTATION_DIR, CACHE_DIR, MODELS_DIR
 import joblib
 plt.rcParams['font.family'] = 'AppleGothic'
 
 
-DATASET_ROOT = 'music_dataset'
-AUDIO_DIR = os.path.join(DATASET_ROOT, 'audio')
-ANNOTATIONS_DIR = os.path.join(DATASET_ROOT, 'annotation')
-NUM_SONGS = 20 
+ANNOTATIONS_DIR = ANNOTATION_DIR
+NUM_SONGS = 20
 SR = 22050
 N_MFCC = 13
 HOP_LENGTH = 512
-X = np.load('X.npy')
-y = np.load('y.npy')
+X = np.load(os.path.join(CACHE_DIR, 'X.npy'))
+y = np.load(os.path.join(CACHE_DIR, 'y.npy'))
 
 #バリデーション
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
@@ -82,11 +83,11 @@ accuracy = accuracy_score(y_test, y_pred)
 print(f"\nAccuracy: {accuracy:.4f}")
 
 #学習済みモデルの保存
-MODEL_SAVE_PATH = 'trained_random_forest_chorus_detector.pkl'
+MODEL_SAVE_PATH = os.path.join(MODELS_DIR, 'trained_random_forest_chorus_detector.pkl')
 joblib.dump(model, MODEL_SAVE_PATH)
 print(f"\n学習済みモデルを '{MODEL_SAVE_PATH}' に保存しました。")
 
-CONFIG_SAVE_PATH = 'feature_extraction_config.json'
+CONFIG_SAVE_PATH = os.path.join(MODELS_DIR, 'feature_extraction_config.json')
 import json
 config = {
     'SR': SR,

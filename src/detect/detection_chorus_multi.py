@@ -3,6 +3,9 @@
 import librosa
 import numpy as np
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # src/ を import パスに追加
+from paths import TEST_AUDIO_DIR, MODELS_DIR
 import joblib 
 import json   
 import matplotlib.pyplot as plt
@@ -13,12 +16,11 @@ plt.rcParams['font.family'] = 'AppleGothic'
 plt.rcParams['axes.unicode_minus'] = False 
 
 # 設定ファイルとモデルファイルのパス
-MODEL_PATH = 'trained_random_forest_chorus_detector.pkl'
-CONFIG_PATH = 'feature_extraction_config.json'
+MODEL_PATH = os.path.join(MODELS_DIR, 'trained_random_forest_chorus_detector.pkl')
+CONFIG_PATH = os.path.join(MODELS_DIR, 'feature_extraction_config.json')
 
 # サビ検出したい複数の楽曲のパスリスト
-DATASET_ROOT = 'music_dataset'
-AUDIO_DIR = os.path.join(DATASET_ROOT, 'test_audio')
+AUDIO_DIR = TEST_AUDIO_DIR
 NUM_SONGS_TO_DETECT = 3 
 SONG_PATHS_TO_DETECT = [os.path.join(AUDIO_DIR, f"song_{i:03d}.wav") for i in range(1, NUM_SONGS_TO_DETECT + 1)]
 

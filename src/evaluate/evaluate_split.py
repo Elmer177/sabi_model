@@ -8,11 +8,14 @@ sabi_model.py は train_test_split でフレームをランダムに分けてい
 を比べる。
 
 既存の X.npy / y.npy / 学習済みモデルは上書きしない。
-曲ごとの特徴量は features_per_song.npz にキャッシュする（2 回目以降は音声を読み直さない）。
+曲ごとの特徴量は cache/features_per_song.npz にキャッシュする（2 回目以降は音声を読み直さない）。
+結果は results/result_split_comparison.csv。
 """
 
 import json
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # src/ を import パスに追加
 
 import librosa
 import numpy as np
@@ -21,14 +24,15 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
 
-DATASET_ROOT = "music_dataset"
-AUDIO_DIR = os.path.join(DATASET_ROOT, "audio")
-ANNOTATIONS_DIR = os.path.join(DATASET_ROOT, "annotation")
+from paths import AUDIO_DIR, ANNOTATION_DIR, CACHE_DIR, MODELS_DIR, RESULTS_DIR
+
+ANNOTATIONS_DIR = ANNOTATION_DIR
 NUM_SONGS = 20
-with open("feature_extraction_config.json") as f:
+with open(os.path.join(MODELS_DIR, "feature_extraction_config.json")) as f:
     config = json.load(f)
 SR, N_MFCC, HOP_LENGTH = config["SR"], config["N_MFCC"], config["HOP_LENGTH"]
-CACHE = "features_per_song.npz"
+CACHE = os.path.join(CACHE_DIR, "features_per_song.npz")
+RESULT_CSV = os.path.join(RESULTS_DIR, "result_split_comparison.csv")
 STRIDE = 4  # 学習・評価に使うフレームを 4 つに 1 つに間引く（隣接フレームはほぼ同じなので情報はほぼ減らない。計算を 1/4 に）
 
 
@@ -64,8 +68,8 @@ else:
     np.savez_compressed(CACHE, X=X, y=y, song_id=song_id)
 
 # 既存の X.npy / y.npy と一致するか確認（同じ処理で作れているか）
-if os.path.exists("X.npy"):
-    X_old, y_old = np.load("X.npy"), np.load("y.npy")
+if os.path.exists(os.path.join(CACHE_DIR, "X.npy")):
+    X_old, y_old = np.load(os.path.join(CACHE_DIR, "X.npy")), np.load(os.path.join(CACHE_DIR, "y.npy"))
     same = X_old.shape == X.shape and np.allclose(X_old, X, atol=1e-3) and np.array_equal(y_old, y)
     print(f"既存の X.npy / y.npy と一致: {same}")
 
@@ -101,5 +105,5 @@ res = pd.DataFrame(rows)
 print(f"\n(B) 曲単位の分割（20 曲の平均）: 正解率 {res['正解率'].mean():.3f}，サビの F1 {res['サビの F1'].mean():.3f}")
 print(f"    参考: 全フレームを「非サビ」と答えるだけの正解率 = {1 - y.mean():.3f}")
 print(f"\n(A) − (B): 正解率 {acc_a - res['正解率'].mean():+.3f}，F1 {f1_a - res['サビの F1'].mean():+.3f}")
-res.to_csv("result_split_comparison.csv", index=False)
+res.to_csv(RESULT_CSV, index=False)
 print("曲ごとの結果を result_split_comparison.csv に保存")

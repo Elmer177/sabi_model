@@ -132,3 +132,7 @@ cookies.txt
 *.aup3
 *.pkl
 *.npy
+*.npz
+
+# プライバシー
+.my_wav_files/

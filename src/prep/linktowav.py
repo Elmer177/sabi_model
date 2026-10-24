@@ -1,4 +1,7 @@
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # src/ を import パスに追加
+from paths import MY_WAV_DIR
 from yt_dlp import YoutubeDL
 
 def download_youtube_as_wav(url, output_directory):
@@ -30,6 +33,6 @@ def download_youtube_as_wav(url, output_directory):
 
 # 使い方
 youtube_url = "https://www.youtube.com/watch?v=lw51UR6Qoy8"
-output_dir = "./my_wav_files"
+output_dir = MY_WAV_DIR  # プロジェクト直下の my_wav_files
 
 download_youtube_as_wav(youtube_url, output_dir)

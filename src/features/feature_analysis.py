@@ -2,11 +2,12 @@ import librosa
 import numpy as np
 import pandas as pd
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # src/ を import パスに追加
+from paths import AUDIO_DIR, ANNOTATION_DIR, CACHE_DIR
 
 #変数の宣言
-DATASET_ROOT = 'music_dataset' # データセットのルートディレクトリ
-AUDIO_DIR = os.path.join(DATASET_ROOT, 'audio')
-ANNOTATIONS_DIR = os.path.join(DATASET_ROOT, 'annotation')
+ANNOTATIONS_DIR = ANNOTATION_DIR
 NUM_SONGS = 20     #曲数
 SR = 22050        # サンプリングレート
 N_MFCC = 13       # MFCCの次元数
@@ -105,6 +106,6 @@ print(f"サビの割合: {num_sabi_frames / len(y) * 100:.2f}%")
 # Xは (全フレーム数, MFCC次元数) の2次元配列
 # yは (全フレーム数,) の1次元配列 (各フレームのラベル)
 
-np.save('X.npy', X)
-np.save('y.npy', y)
+np.save(os.path.join(CACHE_DIR, 'X.npy'), X)
+np.save(os.path.join(CACHE_DIR, 'y.npy'), y)
 print("特徴量とラベルを 'X.npy', 'y.npy' として保存")
