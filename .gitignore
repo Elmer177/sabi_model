@@ -136,3 +136,6 @@ cookies.txt
 
 # プライバシー
 .my_wav_files/
+# Python キャッシュ
+__pycache__/
+*.pyc
