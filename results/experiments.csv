@@ -29,8 +29,3 @@ v3_5,曲単位の分割（学習用 20 曲）,2026-10-28T05:45:09,edd0752,mfcc r
 v3_6,曲単位の分割（学習用 20 曲）,2026-10-28T05:47:10,524ed29,mfcc rep_all_8 rep_all_16 rep_all_32 rep_all_64,21,"RandomForestClassifier(class_weight='balanced', max_features=None,
                        min_samples_leaf=20, n_jobs=-1, random_state=42)",,17,0.5,0.7880940547384138,0.7054785794971937,0.8665468335354621,0.8121492634193963,0.1085629113893965
 v4,曲単位の分割（学習用 20 曲）,2026-10-28T05:51:14,ff2e318,mfcc rep_all_32,15,"LogisticRegression(class_weight='balanced', max_iter=1000)",,17,0.5,0.7610016530600345,0.6867777697595039,0.8334912676339817,0.7803059470177667,0.1159901202086692
-v5,曲単位の分割（学習用 20 曲）,2026-10-28T05:52:44,b670e18,mfcc rep_all_32,15,"HistGradientBoostingClassifier(class_weight='balanced', learning_rate=0.05,
-                               max_iter=200, random_state=42)",,17,0.5,0.8022216785064431,0.712993990451753,0.8701633773361814,0.8115897335699656,0.1118959347850974
-v6,曲単位の分割（学習用 20 曲）,2026-10-28T05:52:49,ca7b04c,mfcc rep_all_32,15,"KNeighborsClassifier(n_jobs=-1, n_neighbors=101)",,17,0.5,0.6956349187032452,0.6074287868216133,0.8403766168491595,0.7840371170667197,0.1578652257561561
-v7,曲単位の分割（学習用 20 曲）,2026-10-28T05:53:16,98b630a,mfcc rep_all_32,15,"MLPClassifier(alpha=0.001, early_stopping=True, hidden_layer_sizes=(64, 32),
-              max_iter=300, random_state=42)",,17,0.5,0.7810588507636969,0.6762396668928886,0.8708845726189963,0.8072678965050131,0.12909640452285828
