@@ -12,3 +12,5 @@ v1_4,曲単位の分割（学習用 20 曲）,2026-10-28T04:55:31,5b9813f,mfcc,1
 v1_5,曲単位の分割（学習用 20 曲）,2026-10-28T04:55:46,c979336,mfcc,13,"RandomForestClassifier(class_weight='balanced', max_features=None,
                        max_samples=0.1, min_samples_leaf=20, n_jobs=-1,
                        random_state=42)",,17,0.5,0.7749208753787876,0.6900566078266686,0.8562143366114221,0.7939606861763275,0.1516206491345418
+v2,曲単位の分割（学習用 20 曲）,2026-10-28T05:12:49,16de02f,mfcc context,39,"RandomForestClassifier(class_weight='balanced', max_features=None,
+                       min_samples_leaf=20, n_jobs=-1, random_state=42)",,17,0.5,0.7535594415996324,0.7513315234232427,0.8575534127266422,0.8514472989862314,0.17876240623166978
