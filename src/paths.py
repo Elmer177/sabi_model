@@ -10,8 +10,9 @@
     data/music_dataset/   音源（audio, test_audio）とサビのラベル（annotation, test_annotation）
     my_wav_files/         YouTube から取ってきた音源（src/prep/linktowav.py の出力先）
     src/prep/             データ準備（音源のダウンロード）
-    src/features/         特徴量の抽出
-    src/train/            学習
+    src/features/         特徴量の定義（extract.py）とデータセットの作成（build_dataset.py）
+    src/common/           学習・評価の共通処理（experiment.py）
+    src/train/            学習（モデルごとに 1 ファイル。特徴量とモデルだけを書く）
     src/evaluate/         評価
     src/detect/           学習済みモデルでサビ検出
     models/               学習済みモデルと特徴量の設定
@@ -35,5 +36,10 @@ CACHE_DIR = os.path.join(ROOT_DIR, "cache")
 RESULTS_DIR = os.path.join(ROOT_DIR, "results")
 FIGURES_DIR = os.path.join(RESULTS_DIR, "figures")
 
-for _d in (MODELS_DIR, CACHE_DIR, RESULTS_DIR, FIGURES_DIR):
+DATASET_PATH = os.path.join(CACHE_DIR, "dataset.pkl")  # features/build_dataset.py が作る学習用データセット（20 曲）
+TEST_DATASET_PATH = os.path.join(CACHE_DIR, "dataset_test.pkl")  # 同じく最終テスト用（モデル選びには使わない）
+EXPERIMENT_LOG = os.path.join(RESULTS_DIR, "experiments.csv")  # 実験ごとの設定と平均成績の記録
+PREDICTIONS_DIR = os.path.join(RESULTS_DIR, "predictions")  # 実験ごとの予測確率（後から評価し直すため）
+
+for _d in (MODELS_DIR, CACHE_DIR, RESULTS_DIR, FIGURES_DIR, PREDICTIONS_DIR):
     os.makedirs(_d, exist_ok=True)
