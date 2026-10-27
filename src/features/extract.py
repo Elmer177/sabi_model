@@ -10,12 +10,18 @@
   position : 曲の中の位置（0 = 冒頭，1 = 終わり）
   repeat   : 曲の中で何度も繰り返される区間か（自己類似度行列から計算）
 
+  繰り返しの作り方を変えた版（v3 系列の調整用。それぞれ「最大」「上位 3 つの平均」の 2 列）:
+  rep_<比べる音>_<長さ> : 比べる音 = all（MFCC + クロマ）/ chroma（音の高さ = メロディ・和音）/ mfcc（音色）
+                          長さ    = 何区間続けて似ていれば「繰り返し」とみなすか（8 ≈ 2 秒，16 ≈ 4 秒，32 ≈ 8 秒）
+  rep_all_16 は repeat と同じ条件を速い計算方法で求めたもの（値はほぼ同じ）
+
 音量や音質は曲ごとの録音・マスタリングで違うので，position 以外は曲ごとに標準化（平均 0，標準偏差 1）する。
 """
 
 import librosa
 import numpy as np
 import pandas as pd
+from scipy.signal import fftconvolve
 
 SR = 22050
 HOP_LENGTH = 512  # 1 フレーム ≈ 23.2 ms
@@ -25,7 +31,15 @@ CONTEXT_SEGS = 16  # 前後文脈の窓 ≈ 4 秒
 REPEAT_SMOOTH_SEGS = 16  # 繰り返しを判定する長さ ≈ 4 秒
 REPEAT_MIN_LAG_SEGS = 40  # 10 秒以上離れた区間との繰り返しだけ数える（すぐ隣の自分自身を除く）
 
-GROUPS = ["mfcc", "context", "energy", "chroma", "position", "repeat"]
+REPEAT_VARIANTS = {  # グループ名: (比べる音, 長さ [区間])
+    "rep_all_8": ("all", 8),
+    "rep_all_16": ("all", 16),
+    "rep_all_32": ("all", 32),
+    "rep_chroma_16": ("chroma", 16),
+    "rep_mfcc_16": ("mfcc", 16),
+}
+
+GROUPS = ["mfcc", "context", "energy", "chroma", "position", "repeat"] + list(REPEAT_VARIANTS)
 
 
 def _segment_mean(frames):
@@ -61,6 +75,23 @@ def repetition_scores(seg_feats):
     return np.column_stack([best[:, 0], best.mean(axis=1)])
 
 
+def repetition_scores_fast(seg_feats, smooth_segs, min_lag=REPEAT_MIN_LAG_SEGS):
+    """repetition_scores と同じ考え方を，行列の畳み込みでまとめて計算する速い版
+
+    類似度行列 S を「斜め 1 本線（単位行列 / 長さ）」で畳み込むと，すべてのずれについて
+    斜め方向の移動平均が一度に求まる。各区間について min_lag 以上離れた相手の中から上位 3 つを取る。
+    """
+    z = _zscore(seg_feats)
+    z /= np.linalg.norm(z, axis=1, keepdims=True) + 1e-8
+    S = z @ z.T
+    n = len(S)
+    S_smooth = fftconvolve(S, np.eye(smooth_segs) / smooth_segs, mode="same")
+    near = np.abs(np.arange(n)[:, None] - np.arange(n)[None, :]) < min_lag
+    S_smooth[near] = -1.0  # 近すぎる相手（自分自身の続き）は除く
+    top3 = -np.sort(-np.partition(S_smooth, n - 3, axis=1)[:, -3:], axis=1)
+    return np.column_stack([top3[:, 0], top3.mean(axis=1)])
+
+
 def extract_features(y_audio):
     """1 曲の音声 → (区間ごとの特徴量 DataFrame, 区間の開始時刻 [秒])"""
     mfcc = _segment_mean(librosa.feature.mfcc(y=y_audio, sr=SR, n_mfcc=13, hop_length=HOP_LENGTH, n_fft=2048))
@@ -86,6 +117,10 @@ def extract_features(y_audio):
     rep = repetition_scores(np.hstack([mfcc, chroma]))
     df = pd.concat([df, ctx], axis=1)
     df["repeat_max"], df["repeat_top3"] = rep[:, 0], rep[:, 1]
+    sources = {"all": np.hstack([mfcc, chroma]), "chroma": chroma, "mfcc": mfcc}
+    for name, (src, length) in REPEAT_VARIANTS.items():
+        r = repetition_scores_fast(sources[src], length)
+        df[f"{name}_max"], df[f"{name}_top3"] = r[:, 0], r[:, 1]
 
     df = (df - df.mean()) / (df.std() + 1e-8)  # 曲ごとの標準化
     df["position"] = np.arange(n) / max(n - 1, 1)  # 位置は標準化しない
@@ -113,6 +148,9 @@ def columns_for(groups):
         cols += ["position"]
     if "repeat" in groups:
         cols += ["repeat_max", "repeat_top3"]
+    for name in REPEAT_VARIANTS:
+        if name in groups:
+            cols += [f"{name}_max", f"{name}_top3"]
     return cols
 
 
